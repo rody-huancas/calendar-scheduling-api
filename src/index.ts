@@ -3,6 +3,9 @@ import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import { config } from "./config/app.config";
 import { HTTPSTATUS } from "./config/http.cofig";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { asyncHandler } from "./middlewares/asyncHandler.middleware";
+import { BadRequestException } from "./utils/app-error";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -18,11 +21,17 @@ app.use(
   })
 );
 
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  res.status(HTTPSTATUS.OK).json({
-    message: "holi",
-  });
-});
+app.get(
+  "/",
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    throw new BadRequestException("Error personalizado");
+    res.status(HTTPSTATUS.OK).json({
+      message: "holi",
+    });
+  })
+);
+
+app.use(errorHandler);
 
 app.listen(config.PORT, () => {
   console.log(
