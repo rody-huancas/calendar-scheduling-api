@@ -5,6 +5,7 @@ import { config } from "./config/app.config";
 import { HTTPSTATUS } from "./config/http.cofig";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
+import { initializeDatabase } from "./database/database";
 import { BadRequestException } from "./utils/app-error";
 
 const app = express();
@@ -33,8 +34,7 @@ app.get(
 
 app.use(errorHandler);
 
-app.listen(config.PORT, () => {
-  console.log(
-    `Servidor iniciado en el puerto ${config.PORT} en ${config.NODE_ENV}`
-  );
+app.listen(config.PORT, async () => {
+  await initializeDatabase();
+  console.log(`Servidor iniciado en el puerto ${config.PORT} en ${config.NODE_ENV}`);
 });
