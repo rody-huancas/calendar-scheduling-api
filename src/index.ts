@@ -1,6 +1,8 @@
 import "dotenv/config";
+import "./config/passport.config"
 import cors from "cors";
 import express from "express";
+import passport from "passport";
 import authRoutes from "./routes/auth.route";
 import { config } from "./config/app.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -12,6 +14,8 @@ const BASE_PATH = config.BASE_PATH;
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
+
+app.use(passport.initialize())
 
 app.use(
   cors({
