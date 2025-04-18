@@ -1,12 +1,10 @@
 import "dotenv/config";
 import cors from "cors";
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
+import authRoutes from "./routes/auth.route";
 import { config } from "./config/app.config";
-import { HTTPSTATUS } from "./config/http.cofig";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
-import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { initializeDatabase } from "./database/database";
-import { BadRequestException } from "./utils/app-error";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -22,15 +20,7 @@ app.use(
   })
 );
 
-app.get(
-  "/",
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    throw new BadRequestException("Error personalizado");
-    res.status(HTTPSTATUS.OK).json({
-      message: "holi",
-    });
-  })
-);
+app.use(`${BASE_PATH}/auth`, authRoutes);
 
 app.use(errorHandler);
 
