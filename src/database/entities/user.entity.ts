@@ -1,9 +1,9 @@
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Event } from "./event.entity";
+import { Meeting } from "./meeting.entity";
 import { Integration } from "./integration.entity";
 import { Availability } from "./availability.entity";
 import { compareValue, hashValue } from "../../utils/bcrypt";
-import { Meeting } from "./meeting.entity";
 
 @Entity("users")
 export class User {
