@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { HTTPSTATUS } from "../config/http.cofig";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
-import { CreateEventDto } from "../database/dtos/event.dto";
 import { asyncHandlerAndValidate } from "../middlewares/withValidation.middleware";
-import { createEventService, getEventsService } from "../services/event.service";
+import { CreateEventDto, EventIdDto, UserNameDto } from "../database/dtos/event.dto";
+import { createEventService, getEventsService, getPublicEventsByUsernameService, toggleEventPrivacyService } from "../services/event.service";
 
 export const createEventController = asyncHandlerAndValidate(
   CreateEventDto,
@@ -20,7 +20,6 @@ export const createEventController = asyncHandlerAndValidate(
   }
 );
 
-
 export const getUserEventsController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
@@ -35,3 +34,31 @@ export const getUserEventsController = asyncHandler(
     });
   }
 );
+
+export const toggleEventPrivacyController = asyncHandlerAndValidate(
+    EventIdDto,
+    "body",
+    async (req: Request, res: Response, eventIdDto) => {
+      const userId = req.user?.id as string;
+  
+      const event = await toggleEventPrivacyService(userId, eventIdDto.eventId);
+  
+      return res.status(HTTPSTATUS.OK).json({
+        message: `Evento establecido en ${event.isPrivate ? "privado" : "público"} correctamente`
+      });
+    }
+  );
+
+export const getPublicEventsByUsernameController = asyncHandlerAndValidate(
+    UserNameDto,
+    "params",
+    async (req: Request, res: Response, userNameDto) => {
+      const { user, events } = await getPublicEventsByUsernameService(userNameDto.username);
+  
+      return res.status(HTTPSTATUS.OK).json({
+        message: "Eventos públicos recuperados correctamente",
+        user,
+        events
+      });
+    }
+  );
