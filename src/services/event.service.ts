@@ -1,7 +1,7 @@
 import { User } from "../database/entities/user.entity";
 import { slugify } from "../utils/helper";
 import { AppDataSource } from "../config/database.config";
-import { CreateEventDto, EventIdDto } from "../database/dtos/event.dto";
+import { CreateEventDto, EventIdDto, UserNameAndSlugDto } from "../database/dtos/event.dto";
 import { NotFoundException } from "../utils/app-error";
 import { Event, EventLocationEnumType } from "../database/entities/event.entity";
 
@@ -76,7 +76,7 @@ export const getPublicEventsByUsernameService = async (username: string) => {
       isPrivate: false,
     })
     .where("user.username = :username", { username })
-    .select(["user.id", "user.name", "user.imageUrl"])
+    .select(["user.id", "user.name", "user.username", "user.imageUrl"])
     .addSelect([
       "event.id",
       "event.title",
@@ -101,3 +101,28 @@ export const getPublicEventsByUsernameService = async (username: string) => {
     events: user.events,
   };
 };
+
+export const getPublicEventsByUsernameAndSlugService = async (userNameAndSlugDto: UserNameAndSlugDto) => {
+  const { username, slug } = userNameAndSlugDto;
+
+  const eventRepository = AppDataSource.getRepository(Event);
+  
+  const event = await eventRepository
+    .createQueryBuilder("event")
+    .leftJoinAndSelect("event.user", "user")
+    .where("user.username = :username", { username })
+    .andWhere("event.slug = :slug", { slug })
+    .andWhere("event.isPrivate = :isPrivate", { isPrivate: false })
+    .select([
+      "event.id",
+      "event.title",
+      "event.description",
+      "event.slug",
+      "event.duration",
+      "event.locationType",
+    ])
+    .addSelect(["user.id", "user.name", "user.username", "user.imageUrl"])
+    .getOne();
+
+  return event;
+}

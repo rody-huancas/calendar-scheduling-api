@@ -31,7 +31,7 @@ export class User {
   @OneToMany(() => Integration, (integration) => integration.user, { cascade: true })
   integrations: Integration[];
 
-  @OneToOne(() => Availability, (availability) => availability.user)
+  @OneToOne(() => Availability, (availability) => availability.user, { cascade: true })
   @JoinColumn()
   availability: Availability;
 
