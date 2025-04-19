@@ -5,6 +5,7 @@ import { asyncHandlerAndValidate } from "../middlewares/withValidation.middlewar
 import { CreateEventDto, EventIdDto, UserNameAndSlugDto, UserNameDto } from "../database/dtos/event.dto";
 import {
   createEventService,
+  deleteEventService,
   getEventsService,
   getPublicEventsByUsernameAndSlugService,
   getPublicEventsByUsernameService,
@@ -78,6 +79,20 @@ export const getPublicEventsByUsernameAndSlugController = asyncHandlerAndValidat
       return res.status(HTTPSTATUS.OK).json({
         message: "Detalles del evento recuperados correctamente",
         event
+      });
+    }
+  );
+
+export const deleteEventController = asyncHandlerAndValidate(
+    EventIdDto,
+    "params",
+    async (req: Request, res: Response, eventIdDto) => {
+      const userId = req.user?.id as string;
+
+      await deleteEventService(userId, eventIdDto.eventId);
+  
+      return res.status(HTTPSTATUS.OK).json({
+        message: "Evento eliminado correctamente",
       });
     }
   );
