@@ -1,7 +1,7 @@
 import { User } from "../database/entities/user.entity";
 import { slugify } from "../utils/helper";
 import { AppDataSource } from "../config/database.config";
-import { CreateEventDto } from "../database/dtos/event.dto";
+import { CreateEventDto, EventIdDto } from "../database/dtos/event.dto";
 import { NotFoundException } from "../utils/app-error";
 import { Event, EventLocationEnumType } from "../database/entities/event.entity";
 
@@ -43,5 +43,61 @@ export const getEventsService = async (userId: string) => {
   return {
     events: user.events,
     username: user.username,
+  };
+};
+
+export const toggleEventPrivacyService = async (userId: string, eventId: string) => {
+  const eventRepository = AppDataSource.getRepository(Event);
+
+  const event = await eventRepository.findOne({
+    where: {
+      id: eventId,
+      user: { id: userId },
+    },
+  });
+
+  if (!event) {
+    throw new NotFoundException("Evento no encontrado.");
+  }
+
+  event.isPrivate = !event.isPrivate;
+
+  await eventRepository.save(event);
+
+  return event;
+};
+
+export const getPublicEventsByUsernameService = async (username: string) => {
+  const userRepository = AppDataSource.getRepository(User);
+
+  const user = await userRepository
+    .createQueryBuilder("user")
+    .leftJoinAndSelect("user.events", "event", "event.isPrivate = :isPrivate", {
+      isPrivate: false,
+    })
+    .where("user.username = :username", { username })
+    .select(["user.id", "user.name", "user.imageUrl"])
+    .addSelect([
+      "event.id",
+      "event.title",
+      "event.description",
+      "event.slug",
+      "event.duration",
+      "event.locationType",
+    ])
+    .orderBy("event.createdAt", "DESC")
+    .getOne();
+
+  if (!user) {
+    throw new NotFoundException("User not found");
+  }
+
+  return {
+    user: {
+      name: user.name,
+      username: username,
+      imageUrl: user.imageUrl,
+    },
+    events: user.events,
   };
 };

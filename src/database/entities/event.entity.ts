@@ -18,6 +18,9 @@ export class Event {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ default: 30 })
+  duration: number;
+
   @Column({ nullable: false })
   slug: string;
 
