@@ -2,8 +2,14 @@ import { Request, Response } from "express";
 import { HTTPSTATUS } from "../config/http.cofig";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { asyncHandlerAndValidate } from "../middlewares/withValidation.middleware";
-import { CreateEventDto, EventIdDto, UserNameDto } from "../database/dtos/event.dto";
-import { createEventService, getEventsService, getPublicEventsByUsernameService, toggleEventPrivacyService } from "../services/event.service";
+import { CreateEventDto, EventIdDto, UserNameAndSlugDto, UserNameDto } from "../database/dtos/event.dto";
+import {
+  createEventService,
+  getEventsService,
+  getPublicEventsByUsernameAndSlugService,
+  getPublicEventsByUsernameService,
+  toggleEventPrivacyService,
+} from "../services/event.service";
 
 export const createEventController = asyncHandlerAndValidate(
   CreateEventDto,
@@ -59,6 +65,19 @@ export const getPublicEventsByUsernameController = asyncHandlerAndValidate(
         message: "Eventos públicos recuperados correctamente",
         user,
         events
+      });
+    }
+  );
+
+export const getPublicEventsByUsernameAndSlugController = asyncHandlerAndValidate(
+    UserNameAndSlugDto,
+    "params",
+    async (req: Request, res: Response, userNameAndSlugDto) => {
+      const event = await getPublicEventsByUsernameAndSlugService(userNameAndSlugDto);
+  
+      return res.status(HTTPSTATUS.OK).json({
+        message: "Detalles del evento recuperados correctamente",
+        event
       });
     }
   );
