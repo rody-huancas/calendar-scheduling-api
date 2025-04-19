@@ -126,3 +126,22 @@ export const getPublicEventsByUsernameAndSlugService = async (userNameAndSlugDto
 
   return event;
 }
+
+export const deleteEventService = async (userId: string, enventId: string) => {
+  const eventRepository = AppDataSource.getRepository(Event);
+
+  const event = await eventRepository.findOne({
+    where: {
+      id: enventId,
+      user: { id: userId },
+    },
+  });
+
+  if (!event) {
+    throw new NotFoundException("Evento no encontrado.");
+  }
+
+  await eventRepository.remove(event);
+
+  return { success: true }
+}
