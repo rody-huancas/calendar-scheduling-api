@@ -3,7 +3,8 @@ import { HTTPSTATUS } from "../config/http.cofig";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { UpdateAvailabilityDto } from "../database/dtos/availability.dto";
 import { asyncHandlerAndValidate } from "../middlewares/withValidation.middleware";
-import { getUserAvailabilityService, updateAvailabilityService } from "../services/availability.service";
+import { getAvailabilityForPublicEventService, getUserAvailabilityService, updateAvailabilityService } from "../services/availability.service";
+import { EventIdDto } from '../database/dtos/event.dto';
 
 export const getUserAvailabilityController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -28,6 +29,21 @@ export const updateAvailabilityController = asyncHandlerAndValidate(
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Disponibilidad actualizada con éxito",
+    });
+  }
+);
+
+// para eventos públicos
+export const getAvailabilityForPublicEventController = asyncHandlerAndValidate(
+  EventIdDto,
+  "params",
+  async (req: Request, res: Response, eventIdDto) => {
+    const availability = await getAvailabilityForPublicEventService(
+      eventIdDto.eventId
+    );
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Event availability fetched successfully",
+      data: availability,
     });
   }
 );
