@@ -2,8 +2,9 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { User } from "./user.entity";
 
 export enum IntegrationProviderEnum {
-  GOOGLE = "GOOGLE",
-  ZOOM   = "ZOOM",
+  GOOGLE    = "GOOGLE",
+  ZOOM      = "ZOOM",
+  MICROSOFT = "MICROSOFT",
 }
 
 export enum IntegrationAppTypeEnum {
