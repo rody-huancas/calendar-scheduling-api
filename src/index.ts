@@ -5,6 +5,7 @@ import express from "express";
 import passport from "passport";
 import authRoutes from "./routes/auth.route";
 import eventRoutes from "./routes/event.route";
+import integrationRoutes from "./routes/integration.route";
 import availabilityRoutes from "./routes/avalability.route";
 import { config } from "./config/app.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -29,6 +30,7 @@ app.use(
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/event`, eventRoutes);
 app.use(`${BASE_PATH}/availability`, availabilityRoutes);
+app.use(`${BASE_PATH}/integration`, integrationRoutes);
 
 app.use(errorHandler);
 
