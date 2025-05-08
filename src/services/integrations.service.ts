@@ -51,3 +51,17 @@ export const getUserIntegrationsService = async (userId: string) => {
     };
   });
 };
+
+export const checkIntegrationService = async(userId: string, appType: IntegrationAppTypeEnum) => {
+  const integrationRepository = AppDataSource.getRepository(Integration);
+
+  const integration = await integrationRepository.findOne({
+    where: { user: { id: userId }, app_type: appType },
+  });
+
+  if (!integration) {
+    return false;
+  }
+
+  return true;
+}
