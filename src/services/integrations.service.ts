@@ -1,10 +1,14 @@
+import { encode } from 'js-base64'
 import { AppDataSource } from "../config/database.config";
+import { googleOAuth2Client } from "../config/oauth.config";
 import {
   Integration,
   IntegrationAppTypeEnum,
   IntegrationCategoryEnum,
   IntegrationProviderEnum,
 } from "../database/entities/integration.entity";
+import { BadRequestException } from "../utils/app-error";
+import { encodeState } from '../utils/helper';
 
 const appTypeToProviderMap: Record<
   IntegrationAppTypeEnum,
@@ -64,4 +68,26 @@ export const checkIntegrationService = async(userId: string, appType: Integratio
   }
 
   return true;
+}
+
+export const connectAppService = async (userId: string, appType: IntegrationAppTypeEnum) => {
+  const state = encodeState({ userId, appType })
+
+  let authUrl: string;
+
+  switch(appType) {
+    case IntegrationAppTypeEnum.GOOGLE_MEET_AND_CALENDAR:
+      authUrl = googleOAuth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: ["https://www.googleapis.com/auth/calendar.events"],
+        prompt: "consent",
+        state
+      })
+      break
+      
+    default:
+      throw new BadRequestException("Integración no soportada");
+  }
+
+  return { url: authUrl };
 }

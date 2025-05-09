@@ -3,7 +3,7 @@ import { HTTPSTATUS } from "../config/http.cofig";
 import { AppTypeDTO } from "../database/dtos/integration.dto";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { asyncHandlerAndValidate } from "../middlewares/withValidation.middleware";
-import { checkIntegrationService, getUserIntegrationsService } from "../services/integrations.service";
+import { checkIntegrationService, connectAppService, getUserIntegrationsService } from "../services/integrations.service";
 
 export const getUserIntegrationsController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -34,3 +34,20 @@ export const checkIntegrationController = asyncHandlerAndValidate(
     });
   }
 );
+
+export const connectAppController = asyncHandlerAndValidate(
+  AppTypeDTO,
+  "params",
+  async (req: Request, res: Response, appTypeDto) => {
+    const userId = req.user?.id as string;
+
+    const { url } = await connectAppService(
+      userId,
+      appTypeDto.appType
+    );
+
+    return res.status(HTTPSTATUS.OK).json({
+      url
+    });
+  }
+)
